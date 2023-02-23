@@ -107,7 +107,7 @@ public class UserHandler implements HttpHandler {
         String path = httpExchange.getRequestURI().getPath().substring(1);
         if(path.split("/").length > 1) {
             long id = Long.parseLong(path.split("/")[1]);
-            if (id >= 0) {
+            if (id > 0) {
                 response = userDao.getUserById(id).toString();
             }
             else {
