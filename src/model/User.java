@@ -9,7 +9,7 @@ public class User {
     private String firstname;
     private String lastname;
     private String phone;
-    private String password;
+    private byte[] password;
     private String address;
 
     public Long getId() {
@@ -40,10 +40,10 @@ public class User {
         this.phone = phone;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return this.password;
     }
-    public void setPassword(String password) {
+    public void setPassword(byte[] password) {
         this.password = password;
     }
 
@@ -60,7 +60,7 @@ public class User {
         user.setFirstname(resultSet.getString("firstname"));
         user.setLastname(resultSet.getString("lastname"));
         user.setPhone(resultSet.getString("phone"));
-        user.setPassword(resultSet.getString("password"));
+        user.setPassword(resultSet.getBytes("password"));
         user.setAddress(resultSet.getString("address"));
         return user;
     }
@@ -71,7 +71,6 @@ public class User {
                 ", \"firstname\": " + "\"" + firstname + "\"" +
                 ", \"lastname\": " + "\"" + lastname + "\"" +
                 ", \"phone\": " + "\"" + phone + "\"" +
-                ", \"password\": " + "\"" + password + "\"" +
                 ", \"address\": " + "\"" + address + "\"" + "}";
     }
 

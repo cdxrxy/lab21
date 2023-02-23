@@ -1,9 +1,12 @@
 package dao;
 
 import exception.EmptyUserSetException;
+import exception.UserAlreadyExistsException;
 import exception.UserNotExistsException;
 import model.User;
+import util.HashUtil;
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +18,14 @@ public class UserDao {
         this.connection = connection;
     }
 
-    public int createUser(String firstname, String lastname, String phone, String password, String address)
-            throws SQLException {
+    public void createUser(String firstname, String lastname, String phone, String password, String address)
+            throws SQLException, NoSuchAlgorithmException {
+        if(existsByPhone(phone)) {
+            throw new UserAlreadyExistsException("User with this phone already exists");
+        }
+
+        byte[] hashPassword = HashUtil.hashPassword(password);
+
         PreparedStatement preparedStatement = connection
                 .prepareStatement("INSERT INTO users (firstname, lastname, phone, password, address)" +
                         "VALUES (?, ?, ?, ?, ?)");
@@ -24,10 +33,10 @@ public class UserDao {
         preparedStatement.setString(1, firstname);
         preparedStatement.setString(2, lastname);
         preparedStatement.setString(3, phone);
-        preparedStatement.setString(4, password);
+        preparedStatement.setBytes(4, hashPassword);
         preparedStatement.setString(5, address);
 
-        return preparedStatement.executeUpdate();
+        preparedStatement.executeUpdate();
     }
 
     public List<User> getAllUsers() throws SQLException {
@@ -37,9 +46,12 @@ public class UserDao {
         if(!resultSet.next()) {
             throw new EmptyUserSetException("There is no users");
         }
+
+        users.add(User.resultSetToUser(resultSet));
         while(resultSet.next()) {
             users.add(User.resultSetToUser(resultSet));
         }
+
         return users;
     }
 
@@ -50,6 +62,18 @@ public class UserDao {
         if(!resultSet.next()) {
             throw new UserNotExistsException("User doesn't exist");
         }
+
+        return User.resultSetToUser(resultSet);
+    }
+
+    public User getUserByPhone(String phone) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE phone = ?");
+        preparedStatement.setString(1, phone);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(!resultSet.next()) {
+            throw new UserNotExistsException("User doesn't exist");
+        }
+
         return User.resultSetToUser(resultSet);
     }
 
@@ -61,5 +85,14 @@ public class UserDao {
         preparedStatement.setLong(2, id);
 
         return preparedStatement.executeUpdate();
+    }
+
+    public boolean existsByPhone(String phone) throws SQLException{
+        PreparedStatement existsByPhone = connection.
+                prepareStatement("SELECT 1 FROM users WHERE phone = ?");
+        existsByPhone.setString(1, phone);
+        ResultSet resultSet = existsByPhone.executeQuery();
+
+        return resultSet.next();
     }
 }

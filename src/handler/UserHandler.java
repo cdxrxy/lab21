@@ -4,10 +4,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import dao.UserDao;
 import exception.EmptyUserSetException;
+import exception.UserAlreadyExistsException;
 import exception.UserNotExistsException;
 import util.Database;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -35,17 +37,17 @@ public class UserHandler implements HttpHandler {
         try (Connection connection = Database.getDB(url, user, password).getConnection()) {
             UserDao userDao = new UserDao(connection);
 
-            if ("GET".equals(exchange.getRequestMethod())) {
+            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
                 handleGetRequest(exchange, userDao);
                 return;
             }
-            if ("POST".equals(exchange.getRequestMethod())) {
+            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 handlePostRequest(exchange, userDao);
                 return;
             }
 
             ErrorHandler.handleError(exchange, "Method Not Allowed", 405);
-        } catch (EmptyUserSetException | UserNotExistsException e) {
+        } catch (EmptyUserSetException | UserNotExistsException | UserAlreadyExistsException e) {
             ErrorHandler.handleError(exchange, e.getMessage(), 400);
             e.printStackTrace();
         } catch (SQLException e) {
@@ -60,7 +62,14 @@ public class UserHandler implements HttpHandler {
         }
     }
 
-    private void handlePostRequest(HttpExchange httpExchange, UserDao userDao) throws IOException, SQLException {
+    private void handlePostRequest(HttpExchange httpExchange, UserDao userDao)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+        String path = httpExchange.getRequestURI().getPath().substring(1);
+        if(path.split("/").length > 1) {
+            ErrorHandler.handleError(httpExchange, "Not Found", 404);
+            return;
+        }
+
         InputStream is = httpExchange.getRequestBody();
         InputStreamReader isr = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(isr);
