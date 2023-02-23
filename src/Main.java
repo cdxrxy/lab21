@@ -14,7 +14,7 @@ public class Main {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
         httpServer.createContext("/users", new UserHandler(dbUrl, dbUser, dbPassword))
                 .setAuthenticator(new BasicAuth("users"));
-        System.out.println("Server started on port 8080");
         httpServer.start();
+        System.out.println("Server started on port 8080");
     }
 }
