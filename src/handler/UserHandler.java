@@ -82,11 +82,11 @@ public class UserHandler implements HttpHandler {
 
         String body = sb.toString();
         body = body.substring(1, body.length() - 1);
-        body = body.replaceAll(" ", "").replaceAll("\"", "");
+        body = body.replaceAll("\"", "");
 
         Map<String, String> bodyMap = new HashMap<>();
         Arrays.stream(body.split(","))
-                .forEach(string -> bodyMap.put(string.split(":")[0], string.split(":")[1]));
+                .forEach(string -> bodyMap.put(string.split(":")[0].trim(), string.split(":")[1].trim()));
 
         userDao.createUser(bodyMap.get("firstname"), bodyMap.get("lastname"),
                 bodyMap.get("phone"), bodyMap.get("password"), bodyMap.get("address"));
