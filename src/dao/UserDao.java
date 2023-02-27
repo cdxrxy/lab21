@@ -5,6 +5,7 @@ import exception.UserAlreadyExistsException;
 import exception.UserNotExistsException;
 import model.User;
 import util.HashUtil;
+import util.Role;
 
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
@@ -35,7 +36,24 @@ public class UserDao {
         preparedStatement.setString(3, phone);
         preparedStatement.setBytes(4, hashPassword);
         preparedStatement.setString(5, address);
-        preparedStatement.setString(6, "ROLE_USER");
+        preparedStatement.setString(6, Role.ROLE_USER.getRole());
+
+        preparedStatement.executeUpdate();
+    }
+
+    public void createAdmin() throws SQLException, NoSuchAlgorithmException {
+        byte[] hashPassword = HashUtil.hashPassword("admin");
+
+        PreparedStatement preparedStatement = connection
+                .prepareStatement("INSERT INTO users (firstname, lastname, phone, password, address, role)" +
+                        "VALUES (?, ?, ?, ?, ?, ?)");
+
+        preparedStatement.setString(1, "admin");
+        preparedStatement.setString(2, "admin");
+        preparedStatement.setString(3, "admin");
+        preparedStatement.setBytes(4, hashPassword);
+        preparedStatement.setString(5, "admin");
+        preparedStatement.setString(6, Role.ROLE_ADMIN.getRole());
 
         preparedStatement.executeUpdate();
     }

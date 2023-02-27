@@ -6,6 +6,7 @@ import exception.UserNotExistsException;
 import model.User;
 import util.Database;
 import util.HashUtil;
+import util.Role;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -24,9 +25,7 @@ public class BasicAuth extends BasicAuthenticator {
     @Override
     public Result authenticate(HttpExchange t) {
         Headers rmap = t.getRequestHeaders();
-        /*
-         * look for auth token
-         */
+
         String auth = rmap.getFirst ("Authorization");
         if (auth == null) {
             setAuthHeader(t);
@@ -36,20 +35,45 @@ public class BasicAuth extends BasicAuthenticator {
         if (sp == -1 || !auth.substring(0, sp).equals ("Basic")) {
             return new Authenticator.Failure (401);
         }
+
         byte[] b = Base64.getDecoder().decode(auth.substring(sp+1));
         String userpass = new String (b, StandardCharsets.UTF_8);
         int colon = userpass.indexOf (':');
-        String uname = userpass.substring (0, colon);
+        String phone = userpass.substring (0, colon);
         String pass = userpass.substring (colon+1);
 
-        if (checkCredentials (uname, pass)) {
-            return new Authenticator.Success (
-                    new HttpPrincipal(
-                            uname, realm
-                    )
-            );
+        User user;
+
+        try (Connection connection = Database.getDB(dbUrl, dbUser, dbPassword).getConnection()){
+            UserDao userDao = new UserDao(connection);
+            user = userDao.getUserByPhone(phone);
+        }
+        catch (UserNotExistsException e) {
+            return new Authenticator.Failure (401);
+        }
+        catch (SQLException e) {
+            return new Authenticator.Failure (500);
+        }
+
+        if (checkCredentials (phone, pass)) {
+            if ("GET".equalsIgnoreCase(t.getRequestMethod())) {
+                return new Authenticator.Success(
+                        new HttpPrincipal(
+                                phone, realm
+                        )
+                );
+            }
+            if (("POST".equalsIgnoreCase(t.getRequestMethod()) || "PUT".equalsIgnoreCase(t.getRequestMethod()))
+                    && user.getRole().equals(Role.ROLE_ADMIN.getRole())) {
+                return new Authenticator.Success(
+                        new HttpPrincipal(
+                                phone, realm
+                        )
+                );
+            } else {
+                return new Authenticator.Failure(403);
+            }
         } else {
-            /* reject the request again with 401 */
             setAuthHeader(t);
             return new Authenticator.Failure(401);
         }

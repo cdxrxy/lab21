@@ -6,19 +6,18 @@ import dao.UserDao;
 import util.Database;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class RegisterHandler implements HttpHandler {
-    private final String url;
-    private final String user;
-    private final String password;
+    private final String dbUrl;
+    private final String dbUser;
+    private final String dbPassword;
 
-    public RegisterHandler(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
+    public RegisterHandler(String dbUrl, String dbUser, String dbPassword) {
+        this.dbUrl = dbUrl;
+        this.dbUser = dbUser;
+        this.dbPassword = dbPassword;
     }
 
     @Override
@@ -28,7 +27,7 @@ public class RegisterHandler implements HttpHandler {
             return;
         }
 
-        try(Connection connection = Database.getDB(url, user, password).getConnection()) {
+        try(Connection connection = Database.getDB(dbUrl, dbUser, dbPassword).getConnection()) {
             UserDao userDao = new UserDao(connection);
 
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
