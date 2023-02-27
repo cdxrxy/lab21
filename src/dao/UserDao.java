@@ -77,14 +77,18 @@ public class UserDao {
         return User.resultSetToUser(resultSet);
     }
 
-    public int updateUserById(Long id, String address) throws SQLException {
+    public void updateUserById(Long id, String address) throws SQLException {
+        if(!existsById(id)) {
+            throw new UserNotExistsException("There is no user with such id");
+        }
+
         PreparedStatement preparedStatement = connection
                 .prepareStatement("UPDATE users SET address = ? WHERE id = ?");
 
         preparedStatement.setString(1, address);
         preparedStatement.setLong(2, id);
 
-        return preparedStatement.executeUpdate();
+        preparedStatement.executeUpdate();
     }
 
     public boolean existsByPhone(String phone) throws SQLException{
@@ -92,6 +96,15 @@ public class UserDao {
                 prepareStatement("SELECT 1 FROM users WHERE phone = ?");
         existsByPhone.setString(1, phone);
         ResultSet resultSet = existsByPhone.executeQuery();
+
+        return resultSet.next();
+    }
+
+    public boolean existsById(Long id) throws SQLException{
+        PreparedStatement existsById = connection.
+                prepareStatement("SELECT 1 FROM users WHERE id = ?");
+        existsById.setLong(1, id);
+        ResultSet resultSet = existsById.executeQuery();
 
         return resultSet.next();
     }
