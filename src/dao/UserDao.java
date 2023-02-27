@@ -27,14 +27,15 @@ public class UserDao {
         byte[] hashPassword = HashUtil.hashPassword(password);
 
         PreparedStatement preparedStatement = connection
-                .prepareStatement("INSERT INTO users (firstname, lastname, phone, password, address)" +
-                        "VALUES (?, ?, ?, ?, ?)");
+                .prepareStatement("INSERT INTO users (firstname, lastname, phone, password, address, role)" +
+                        "VALUES (?, ?, ?, ?, ?, ?)");
 
         preparedStatement.setString(1, firstname);
         preparedStatement.setString(2, lastname);
         preparedStatement.setString(3, phone);
         preparedStatement.setBytes(4, hashPassword);
         preparedStatement.setString(5, address);
+        preparedStatement.setString(6, "ROLE_USER");
 
         preparedStatement.executeUpdate();
     }

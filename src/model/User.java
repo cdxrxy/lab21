@@ -11,6 +11,7 @@ public class User {
     private String phone;
     private byte[] password;
     private String address;
+    private String role;
 
     public Long getId() {
         return this.id;
@@ -53,6 +54,12 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
+    public String getRole() {
+        return this.role;
+    }
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public static User resultSetToUser(ResultSet resultSet) throws SQLException {
         User user = new User();
@@ -62,6 +69,7 @@ public class User {
         user.setPhone(resultSet.getString("phone"));
         user.setPassword(resultSet.getBytes("password"));
         user.setAddress(resultSet.getString("address"));
+        user.setRole(resultSet.getString("role"));
         return user;
     }
 
@@ -71,7 +79,8 @@ public class User {
                 ", \"firstname\": " + "\"" + firstname + "\"" +
                 ", \"lastname\": " + "\"" + lastname + "\"" +
                 ", \"phone\": " + "\"" + phone + "\"" +
-                ", \"address\": " + "\"" + address + "\"" + "}";
+                ", \"address\": " + "\"" + address + "\"" +
+                ", \"role\": " + "\"" + role + "\"" + "}";
     }
 
     @Override
@@ -80,10 +89,5 @@ public class User {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return Objects.equals(id, user.id) && Objects.equals(firstname, user.firstname) && Objects.equals(lastname, user.lastname) && Objects.equals(phone, user.phone) && Objects.equals(password, user.password) && Objects.equals(address, user.address);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstname, lastname, phone, password, address);
     }
 }

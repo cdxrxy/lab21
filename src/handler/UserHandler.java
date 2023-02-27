@@ -67,7 +67,7 @@ public class UserHandler implements HttpHandler {
         }
     }
 
-    private void handlePostRequest(HttpExchange httpExchange, UserDao userDao)
+    public static void handlePostRequest(HttpExchange httpExchange, UserDao userDao)
             throws IOException, SQLException, NoSuchAlgorithmException {
         String path = httpExchange.getRequestURI().getPath().substring(1);
         if(path.split("/").length > 1) {
