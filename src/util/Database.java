@@ -12,7 +12,8 @@ public class Database {
             String url = "jdbc:postgresql://localhost:5432/code21";
             String user = "root";
             String password = "Qwerty1";
-            return DriverManager.getConnection(url, user, password);
+            connection = DriverManager.getConnection(url, user, password);
+            return connection;
         }
 
         return connection;
