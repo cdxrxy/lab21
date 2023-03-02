@@ -15,9 +15,6 @@ import java.sql.SQLException;
 import java.util.Base64;
 
 public class BasicAuth extends BasicAuthenticator {
-    private static final String dbUrl = "jdbc:postgresql://localhost:5432/code21";
-    private static final String dbUser = "root";
-    private static final String dbPassword = "Qwerty1";
     public BasicAuth(String realm) {
         super(realm);
     }
@@ -44,7 +41,7 @@ public class BasicAuth extends BasicAuthenticator {
 
         User user;
 
-        try (Connection connection = Database.getDB(dbUrl, dbUser, dbPassword).getConnection()){
+        try (Connection connection = Database.getConnection()){
             UserDao userDao = new UserDao(connection);
             user = userDao.getUserByPhone(phone);
         }
@@ -87,7 +84,7 @@ public class BasicAuth extends BasicAuthenticator {
 
     @Override
     public boolean checkCredentials(String phone, String password) {
-        try (Connection connection = Database.getDB(dbUrl, dbUser, dbPassword).getConnection()){
+        try (Connection connection = Database.getConnection()){
             UserDao userDao = new UserDao(connection);
             User user = userDao.getUserByPhone(phone);
 

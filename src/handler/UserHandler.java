@@ -18,16 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class UserHandler implements HttpHandler {
-    private final String url;
-    private final String user;
-    private final String password;
-
-    public UserHandler(String url, String user, String password) {
-        this.url = url;
-        this.user = user;
-        this.password = password;
-    }
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (exchange.getRequestURI().getPath().substring(1).split("/").length > 2) {
@@ -35,7 +25,7 @@ public class UserHandler implements HttpHandler {
             return;
         }
 
-        try (Connection connection = Database.getDB(url, user, password).getConnection()) {
+        try (Connection connection = Database.getConnection()) {
             UserDao userDao = new UserDao(connection);
 
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {

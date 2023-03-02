@@ -10,16 +10,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class RegisterHandler implements HttpHandler {
-    private final String dbUrl;
-    private final String dbUser;
-    private final String dbPassword;
-
-    public RegisterHandler(String dbUrl, String dbUser, String dbPassword) {
-        this.dbUrl = dbUrl;
-        this.dbUser = dbUser;
-        this.dbPassword = dbPassword;
-    }
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (exchange.getRequestURI().getPath().substring(1).split("/").length > 1) {
@@ -27,7 +17,7 @@ public class RegisterHandler implements HttpHandler {
             return;
         }
 
-        try(Connection connection = Database.getDB(dbUrl, dbUser, dbPassword).getConnection()) {
+        try(Connection connection = Database.getConnection()) {
             UserDao userDao = new UserDao(connection);
 
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
