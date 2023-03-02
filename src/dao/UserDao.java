@@ -74,9 +74,9 @@ public class UserDao {
         return users;
     }
 
-    public User getUserById(Long id) throws SQLException {
+    public User getUserById(int id) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE id = ?");
-        preparedStatement.setLong(1, id);
+        preparedStatement.setInt(1, id);
         ResultSet resultSet = preparedStatement.executeQuery();
         if(!resultSet.next()) {
             throw new UserNotExistsException("User doesn't exist");

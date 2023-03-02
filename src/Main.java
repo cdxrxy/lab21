@@ -1,5 +1,6 @@
 import com.sun.net.httpserver.HttpServer;
 import dao.UserDao;
+import handler.ItemHandler;
 import handler.RegisterHandler;
 import handler.UserHandler;
 import security.BasicAuth;
@@ -15,6 +16,8 @@ public class Main {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 0);
         httpServer.createContext("/users", new UserHandler())
                 .setAuthenticator(new BasicAuth("users"));
+        httpServer.createContext("/items", new ItemHandler())
+                .setAuthenticator(new BasicAuth("items"));
         httpServer.createContext("/register", new RegisterHandler());
         httpServer.start();
         System.out.println("Server started on port 8080");

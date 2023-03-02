@@ -45,11 +45,8 @@ public class UserHandler implements HttpHandler {
         } catch (EmptyUserSetException | UserNotExistsException | UserAlreadyExistsException e) {
             ErrorHandler.handleError(exchange, e.getMessage(), 400);
             e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (NumberFormatException | SQLException e) {
             ErrorHandler.handleError(exchange, "Invalid request body", 400);
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            ErrorHandler.handleError(exchange, "Invalid id", 400);
             e.printStackTrace();
         } catch (Exception e) {
             ErrorHandler.handleError(exchange, "Something went wrong", 500);
@@ -101,7 +98,7 @@ public class UserHandler implements HttpHandler {
 
         String path = httpExchange.getRequestURI().getPath().substring(1);
         if(path.split("/").length > 1) {
-            long id = Long.parseLong(path.split("/")[1]);
+            int id = Integer.parseInt(path.split("/")[1]);
             if (id > 0) {
                 response = userDao.getUserById(id).toString();
             }
