@@ -122,12 +122,12 @@ public class UserHandler implements HttpHandler {
     private void handlePutRequest(HttpExchange httpExchange, UserDao userDao)
             throws IOException, SQLException {
         String path = httpExchange.getRequestURI().getPath().substring(1);
-        long id;
+        int id;
 
         String response;
 
         if(path.split("/").length > 1) {
-            id = Long.parseLong(path.split("/")[1]);
+            id = Integer.parseInt(path.split("/")[1]);
 
             if (id < 1) {
                 ErrorHandler.handleError(httpExchange, "Invalid Id", 400);

@@ -61,16 +61,29 @@ public class BasicAuth extends BasicAuthenticator {
                 );
             }
             if (("POST".equalsIgnoreCase(t.getRequestMethod()) || "PUT".equalsIgnoreCase(t.getRequestMethod()))
+                    && (t.getRequestURI().getPath().substring(1).split("/")[0].equalsIgnoreCase("users")
+                    || t.getRequestURI().getPath().substring(1).split("/")[0].equalsIgnoreCase("items"))
                     && user.getRole().equals(Role.ROLE_ADMIN.getRole())) {
                 return new Authenticator.Success(
                         new HttpPrincipal(
                                 phone, realm
                         )
                 );
-            } else {
+            }
+            if ("POST".equalsIgnoreCase(t.getRequestMethod())
+                    && t.getRequestURI().getPath().substring(1).split("/")[0].equalsIgnoreCase("orders")
+                    && user.getRole().equals(Role.ROLE_USER.getRole())) {
+                return new Authenticator.Success(
+                        new HttpPrincipal(
+                                phone, realm
+                        )
+                );
+            }
+            else {
                 return new Authenticator.Failure(403);
             }
-        } else {
+        }
+        else {
             setAuthHeader(t);
             return new Authenticator.Failure(401);
         }

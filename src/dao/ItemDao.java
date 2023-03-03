@@ -61,4 +61,10 @@ public class ItemDao {
 
         return Item.resultSetToItem(resultSet);
     }
+
+    public boolean existsById(int id) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT 1 FROM items WHERE id = ?");
+        preparedStatement.setInt(1, id);
+        return preparedStatement.executeQuery().next();
+    }
 }
